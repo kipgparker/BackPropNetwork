@@ -31,7 +31,7 @@ public class NeuralNetwork : MonoBehaviour
             this.layers[i] = layers[i];
         }
         activations = new int[layers.Length - 1];
-        for(int i = 0; i < layers.Length-1; i++)
+        for (int i = 0; i < layers.Length - 1; i++)
         {
             string action = layerActivations[i];
             switch (action)
@@ -71,8 +71,10 @@ public class NeuralNetwork : MonoBehaviour
 
     private void InitBiases()//initializes random array for the biases being held within the network.
     {
+
+
         List<float[]> biasList = new List<float[]>();
-        for (int i = 0; i < layers.Length; i++)
+        for (int i = 1; i < layers.Length; i++)
         {
             float[] bias = new float[layers[i]];
             for (int j = 0; j < layers[i]; j++)
@@ -91,7 +93,7 @@ public class NeuralNetwork : MonoBehaviour
         {
             List<float[]> layerWeightsList = new List<float[]>();
             int neuronsInPreviousLayer = layers[i - 1];
-            for (int j = 0; j < neurons[i].Length; j++)
+            for (int j = 0; j < layers[i]; j++)
             {
                 float[] neuronWeights = new float[neuronsInPreviousLayer];
                 for (int k = 0; k < neuronsInPreviousLayer; k++)
@@ -113,18 +115,18 @@ public class NeuralNetwork : MonoBehaviour
         }
         for (int i = 1; i < layers.Length; i++)
         {
-            int layer = i-1;
-            for (int j = 0; j < neurons[i].Length; j++)
+            int layer = i - 1;
+            for (int j = 0; j < layers[i]; j++)
             {
                 float value = 0f;
-                for (int k = 0; k < neurons[i - 1].Length; k++)
+                for (int k = 0; k < layers[i - 1]; k++)
                 {
                     value += weights[i - 1][j][k] * neurons[i - 1][k];
                 }
-                neurons[i][j] = activate(value + biases[i][j],layer);
+                neurons[i][j] = activate(value + biases[i-1][j], layer);
             }
         }
-        return neurons[neurons.Length - 1];
+        return neurons[layers.Length-1];
     }
     //Backpropagation implemtation down until mutation.
     public float activate(float value, int layer)//all activation functions
@@ -213,35 +215,35 @@ public class NeuralNetwork : MonoBehaviour
         gamma = gammaList.ToArray();//gamma initialization
 
         int layer = layers.Length - 2;
-        for (int i = 0; i < output.Length; i++) gamma[layers.Length-1][i] = (output[i] - expected[i]) * activateDer(output[i],layer);//Gamma calculation
-        for (int i = 0; i < neurons[layers.Length - 1].Length; i++)//calculates the w' and b' for the last layer in the network
+        for (int i = 0; i < output.Length; i++) gamma[layers.Length - 1][i] = (output[i] - expected[i]) * activateDer(output[i], layer);//Gamma calculation
+        for (int i = 0; i < layers[layers.Length-1]; i++)//calculates the w' and b' for the last layer in the network
         {
-            biases[layers.Length - 1][i] -= gamma[layers.Length - 1][i] * learningRate;
-            for (int j = 0; j < neurons[layers.Length - 2].Length; j++)
+            biases[layers.Length - 2][i] -= gamma[layers.Length - 1][i] * learningRate;
+            for (int j = 0; j < layers[layers.Length-2]; j++)
             {
-                
-                weights[layers.Length - 2][i][j] -= gamma[layers.Length - 1][i] * neurons[layers.Length-2][j] * learningRate;//*learning 
+
+                weights[layers.Length - 2][i][j] -= gamma[layers.Length - 1][i] * neurons[layers.Length - 2][j] * learningRate;//*learning 
             }
         }
 
         for (int i = layers.Length - 2; i > 0; i--)//runs on all hidden layers
         {
             layer = i - 1;
-            for (int j = 0; j < neurons[i].Length; j++)//outputs
+            for (int j = 0; j < layers[i]; j++)//outputs
             {
                 gamma[i][j] = 0;
-                for (int k = 0; k < gamma[i+1].Length; k++)
+                for (int k = 0; k < gamma[i + 1].Length; k++)
                 {
                     gamma[i][j] = gamma[i + 1][k] * weights[i][k][j];
                 }
-                gamma[i][j] *= activateDer(neurons[i][j],layer);//calculate gamma
+                gamma[i][j] *= activateDer(neurons[i][j], layer);//calculate gamma
             }
-            for (int j = 0; j < neurons[i].Length; j++)//itterate over outputs of layer
+            for (int j = 0; j < layers[i]; j++)//itterate over outputs of layer
             {
-                biases[i][j] -= gamma[i][j] * learningRate;//modify biases of network
-                for (int k = 0; k < neurons[i-1].Length; k++)//itterate over inputs to layer
+                biases[i-1][j] -= gamma[i][j] * learningRate;//modify biases of network
+                for (int k = 0; k < layers[i-1]; k++)//itterate over inputs to layer
                 {
-                    weights[i - 1][j][k] -= gamma[i][j] * neurons[i-1][k] * learningRate;//modify weights of network
+                    weights[i - 1][j][k] -= gamma[i][j] * neurons[i - 1][k] * learningRate;//modify weights of network
                 }
             }
         }
