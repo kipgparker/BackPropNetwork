@@ -10,6 +10,6 @@ Neural network capable of forward passing and back-propagation with stochastic g
 
 ## Usage
 
-The files will appear you your assets
+The files will appear in your assets folder
 
 With unity installed you can go to assets/scene/SampleScene.unity and open it
