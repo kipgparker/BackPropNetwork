@@ -234,7 +234,7 @@ public class NeuralNetwork : MonoBehaviour
                 gamma[i][j] = 0;
                 for (int k = 0; k < gamma[i + 1].Length; k++)
                 {
-                    gamma[i][j] = gamma[i + 1][k] * weights[i][k][j];
+                    gamma[i][j] += gamma[i + 1][k] * weights[i][k][j];
                 }
                 gamma[i][j] *= activateDer(neurons[i][j], layer);//calculate gamma
             }
